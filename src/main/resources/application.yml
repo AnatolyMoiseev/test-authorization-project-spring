@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testauthdb?serverTimezone=UTC
+    username: postgres
+    password: root
+    driver-class-name: org.postgresql.Driver
+  liquibase:
+    change-log: classpath:liquibase/db.changelog-master.xml
+    url: jdbc:postgresql://localhost:5432/testauthdb?serverTimezone=UTC
+    user: postgres
+    password: root
+
+jwt:
+  token:
+    secret: aadadadf
+    expired: 3600000
+
+server:
+  port: 8000
+
+#server.port=8000
+#
+#spring.datasource.url=jdbc:postgresql://localhost:5432/testauthdb?serverTimezone=UTC
+#spring.datasource.username=postgres
+#spring.datasource.password=root
+#spring.datasource.driver-class-name=org.postgresql.Driver
+#
+#spring.liquibase.change-log=classpath:liquibase/db.changelog-master.xml
+#spring.liquibase.url=jdbc:postgresql://localhost:5432/testauthdb?serverTimezone=UTC
+#spring.liquibase.user=postgres
+#spring.liquibase.password=root
