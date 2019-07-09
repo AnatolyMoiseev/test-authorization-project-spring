@@ -1,5 +1,6 @@
 package com.test.authorization.service.impl;
 
+import com.test.authorization.dto.SignUpDto;
 import com.test.authorization.exception.ResourceNotFoundException;
 import com.test.authorization.model.Role;
 import com.test.authorization.model.User;
@@ -33,12 +34,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User register(User user) {
+    public User register(SignUpDto signUpDto) {
+        User user = new User();
+
         Role roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> userRoles = new ArrayList<>();
         userRoles.add(roleUser);
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setFirstName(signUpDto.getFirstName());
+        user.setLastName(signUpDto.getLastName());
+        user.setEmail(signUpDto.getEmail());
+        user.setPassword(passwordEncoder.encode(signUpDto.getPassword()));
         user.setRoles(userRoles);
         user.setStatus(Status.ACTIVE);
 

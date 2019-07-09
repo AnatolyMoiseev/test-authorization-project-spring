@@ -1,12 +1,13 @@
 package com.test.authorization.service;
 
+import com.test.authorization.dto.SignUpDto;
 import com.test.authorization.model.User;
 
 import java.util.List;
 
 public interface UserService {
 
-    User register(User user);
+    User register(SignUpDto signUpDto);
 
     List<User> getAll();
 

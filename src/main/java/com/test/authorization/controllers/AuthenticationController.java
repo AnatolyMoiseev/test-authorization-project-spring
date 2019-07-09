@@ -1,6 +1,8 @@
 package com.test.authorization.controllers;
 
-import com.test.authorization.dto.AuthenticationRequestDto;
+import com.test.authorization.dto.SignInDto;
+import com.test.authorization.dto.SignUpDto;
+import com.test.authorization.dto.UserDto;
 import com.test.authorization.model.User;
 import com.test.authorization.security.jwt.JwtTokenProvider;
 import com.test.authorization.service.UserService;
@@ -37,8 +39,8 @@ public class AuthenticationController {
         this.userService = userService;
     }
 
-    @PostMapping("login")
-    public ResponseEntity login(@RequestBody AuthenticationRequestDto requestDto) {
+    @PostMapping("signin")
+    public ResponseEntity signIn(@RequestBody SignInDto requestDto) {
         try {
             String username = requestDto.getUsername();
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, requestDto.getPassword()));
@@ -58,6 +60,11 @@ public class AuthenticationController {
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username or password");
         }
+    }
+
+    @PostMapping("signup")
+    public ResponseEntity signUp(@RequestBody SignUpDto signUpDto) {
+        return ResponseEntity.ok(userService.register(signUpDto));
     }
 
 }

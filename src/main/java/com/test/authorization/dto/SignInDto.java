@@ -3,7 +3,7 @@ package com.test.authorization.dto;
 import lombok.Data;
 
 @Data
-public class AuthenticationRequestDto {
+public class SignInDto {
 
     private String username;
 
