@@ -1,6 +1,7 @@
 package com.test.authorization.service.impl;
 
 import com.test.authorization.dto.SignUpDto;
+import com.test.authorization.exception.AppException;
 import com.test.authorization.exception.ResourceNotFoundException;
 import com.test.authorization.model.Role;
 import com.test.authorization.model.User;
@@ -37,7 +38,7 @@ public class UserServiceImpl implements UserService {
     public User register(SignUpDto signUpDto) {
         User user = new User();
 
-        Role roleUser = roleRepository.findByName("ROLE_USER");
+        Role roleUser = roleRepository.findByName("ROLE_USER").orElseThrow(() -> new AppException("User Role not set."));
         List<Role> userRoles = new ArrayList<>();
         userRoles.add(roleUser);
 

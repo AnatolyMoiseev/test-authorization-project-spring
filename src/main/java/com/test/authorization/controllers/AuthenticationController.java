@@ -2,8 +2,9 @@ package com.test.authorization.controllers;
 
 import com.test.authorization.dto.SignInDto;
 import com.test.authorization.dto.SignUpDto;
-import com.test.authorization.dto.UserDto;
+import com.test.authorization.exception.BadRequestException;
 import com.test.authorization.model.User;
+import com.test.authorization.repository.UserRepository;
 import com.test.authorization.security.jwt.JwtTokenProvider;
 import com.test.authorization.service.UserService;
 
@@ -32,11 +33,14 @@ public class AuthenticationController {
 
     private final UserService userService;
 
+    private final UserRepository userRepository;
+
     @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, UserService userService) {
+    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, UserService userService, UserRepository userRepository) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("signin")
@@ -50,11 +54,13 @@ public class AuthenticationController {
                 throw new UsernameNotFoundException("User with username: " + username + " not found");
             }
 
-            String token = jwtTokenProvider.createToken(username, user.getRoles());
+            String accessToken = jwtTokenProvider.createAccessToken(username, user.getRoles());
+            String refreshToken = jwtTokenProvider.createRefreshToken(username);
 
             Map<Object, Object> response = new HashMap<>();
             response.put("username", username);
-            response.put("token", token);
+            response.put("accessToken", accessToken);
+            response.put("refreshToken", refreshToken);
 
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
@@ -64,6 +70,12 @@ public class AuthenticationController {
 
     @PostMapping("signup")
     public ResponseEntity signUp(@RequestBody SignUpDto signUpDto) {
+        if (userRepository.existsByUsername(signUpDto.getUsername()))
+            throw new BadRequestException("Username is already taken");
+
+        if (userRepository.existsByEmail(signUpDto.getEmail()))
+            throw new BadRequestException("Email Address already in use");
+
         return ResponseEntity.ok(userService.register(signUpDto));
     }
 

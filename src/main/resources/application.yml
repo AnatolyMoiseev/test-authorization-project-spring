@@ -13,19 +13,9 @@ spring:
 jwt:
   token:
     secret: aadadadf
-    expired: 3600000
+    expiredAccess: 3600000
+    expiredRefresh: 400000
+
 
 server:
   port: 8000
-
-#server.port=8000
-#
-#spring.datasource.url=jdbc:postgresql://localhost:5432/testauthdb?serverTimezone=UTC
-#spring.datasource.username=postgres
-#spring.datasource.password=root
-#spring.datasource.driver-class-name=org.postgresql.Driver
-#
-#spring.liquibase.change-log=classpath:liquibase/db.changelog-master.xml
-#spring.liquibase.url=jdbc:postgresql://localhost:5432/testauthdb?serverTimezone=UTC
-#spring.liquibase.user=postgres
-#spring.liquibase.password=root

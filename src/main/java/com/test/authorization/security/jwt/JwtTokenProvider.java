@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
@@ -34,8 +34,11 @@ public class JwtTokenProvider {
     @Value("${jwt.token.secret}")
     private String secret;
 
-    @Value("${jwt.token.expired}")
-    private long validityInMilliseconds;
+    @Value("${jwt.token.expiredAccess}")
+    private long validityInMillisecondsAccess;
+
+    @Value("${jwt.token.expiredRefresh}")
+    private long validityInMillisecondsRefresh;
 
     @Autowired
     private UserDetailsService userDetailsService;
@@ -50,19 +53,36 @@ public class JwtTokenProvider {
         secret = Base64.getEncoder().encodeToString(secret.getBytes());
     }
 
-    public String createToken(String username, List<Role> roles) {
-
+    public String createAccessToken(String username, List<Role> roles) {
         Claims claims = Jwts.claims().setSubject(username);
         claims.put("roles", getRoleNames(roles));
 
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime validity = LocalDateTime.ofInstant(Instant.ofEpochMilli(Timestamp.valueOf(now).getTime()
-                + validityInMilliseconds), ZoneId.systemDefault());
+        LocalDateTime validityAccess = LocalDateTime.ofInstant(Instant.ofEpochMilli(Timestamp.valueOf(now).getTime()
+                + validityInMillisecondsAccess), ZoneId.systemDefault());
 
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(Timestamp.valueOf(now))
-                .setExpiration(Timestamp.valueOf(validity))
+                .setExpiration(Timestamp.valueOf(validityAccess))
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
+
+
+    }
+
+    public String createRefreshToken(String username) {
+        Claims claims = Jwts.claims().setSubject(username);
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime validityRefresh = LocalDateTime.ofInstant(Instant.ofEpochMilli(Timestamp.valueOf(now).getTime()
+                + validityInMillisecondsRefresh), ZoneId.systemDefault());
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setId(UUID.randomUUID().toString())
+                .setIssuedAt(Timestamp.valueOf(now))
+                .setExpiration(Timestamp.valueOf(validityRefresh))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
     }
@@ -102,9 +122,7 @@ public class JwtTokenProvider {
     private List<String> getRoleNames(List<Role> userRoles) {
         List<String> result = new ArrayList<>();
 
-        userRoles.forEach(role -> {
-            result.add(role.getName());
-        });
+        userRoles.forEach(role -> result.add(role.getName()));
 
         return result;
     }
