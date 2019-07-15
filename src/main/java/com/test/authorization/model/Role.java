@@ -1,5 +1,7 @@
 package com.test.authorization.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.List;
 
 import javax.persistence.*;
@@ -15,6 +17,7 @@ public class Role extends BaseEntity {
     private String name;
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    @JsonBackReference
     private List<User> users;
 
     @Override
