@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/api/v1/admin/")
+@RequestMapping(value = "/api/v1/admin")
 public class AdminController {
 
     private final UserService userService;
@@ -23,7 +23,7 @@ public class AdminController {
         this.userService = userService;
     }
 
-    @GetMapping(value = "users/{id}")
+    @GetMapping(value = "/users/{id}")
     public ResponseEntity<AdminUserDto> getUserById(@PathVariable(name = "id") Long id) {
         User user = userService.findById(id);
 

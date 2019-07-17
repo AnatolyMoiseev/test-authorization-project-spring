@@ -67,8 +67,6 @@ public class JwtTokenProvider {
                 .setExpiration(Timestamp.valueOf(validityAccess))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
-
-
     }
 
     public String createRefreshToken(String username) {

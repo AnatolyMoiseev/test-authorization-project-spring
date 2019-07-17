@@ -28,6 +28,9 @@ public class User extends BaseEntity {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonManagedReference
     @JoinTable(name = "user_roles",

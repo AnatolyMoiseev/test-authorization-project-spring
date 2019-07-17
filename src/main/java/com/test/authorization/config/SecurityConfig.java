@@ -19,7 +19,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private static final String ADMIN_ENDPOINT = "/api/v1/admin/**";
     private static final String SIGNIN_ENDPOINT = "/api/v1/auth/signin";
     private static final String SIGNUP_ENDPOINT = "/api/v1/auth/signup";
-    public static final String REFRESH_TOKEN_ENDPOINT = "/api/auth/token";
+    public static final String REFRESH_TOKEN_ENDPOINT = "/api/v1/auth/token";
 
     @Autowired
     public SecurityConfig(JwtTokenProvider jwtTokenProvider) {

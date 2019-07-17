@@ -18,13 +18,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/api/v1/auth/")
+@RequestMapping(value = "/api/v1/auth")
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
@@ -43,7 +40,7 @@ public class AuthenticationController {
         this.userRepository = userRepository;
     }
 
-    @PostMapping("signin")
+    @PostMapping("/signin")
     public ResponseEntity signIn(@RequestBody SignInDto requestDto) {
         try {
             String username = requestDto.getUsername();
@@ -62,13 +59,16 @@ public class AuthenticationController {
             response.put("accessToken", accessToken);
             response.put("refreshToken", refreshToken);
 
+            user.setRefreshToken(refreshToken);
+            userRepository.save(user);
+
             return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             throw new BadCredentialsException("Invalid username or password");
         }
     }
 
-    @PostMapping("signup")
+    @PostMapping("/signup")
     public ResponseEntity signUp(@RequestBody SignUpDto signUpDto) {
         if (userRepository.existsByUsername(signUpDto.getUsername()))
             throw new BadRequestException("Username is already taken");
@@ -77,6 +77,29 @@ public class AuthenticationController {
             throw new BadRequestException("Email Address already in use");
 
         return ResponseEntity.ok(userService.register(signUpDto));
+    }
+
+    @PostMapping("/token")
+    public ResponseEntity refreshToken(@RequestParam String refreshToken) {
+
+        String username = jwtTokenProvider.getUsername(refreshToken);
+        User user = userRepository.findByUsername(username);
+
+        if (user.getRefreshToken().equals(refreshToken)) {
+            String newAccessToken = jwtTokenProvider.createAccessToken(username, user.getRoles());
+            String newRefreshToken = jwtTokenProvider.createRefreshToken(username);
+
+            Map<Object, Object> response = new HashMap<>();
+            response.put("newAccessToken", newAccessToken);
+            response.put("newRefreshToken", newRefreshToken);
+
+            user.setRefreshToken(refreshToken);
+            userRepository.save(user);
+
+            return ResponseEntity.ok(response);
+        }
+
+        return ResponseEntity.ok("Dura");
     }
 
 }

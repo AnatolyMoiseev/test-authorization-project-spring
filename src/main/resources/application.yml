@@ -13,8 +13,8 @@ spring:
 jwt:
   token:
     secret: aadadadf
-    expiredAccess: 3600000
-    expiredRefresh: 400000
+    expiredAccess: 900000
+    expiredRefresh: 3600000
 
 
 server:
