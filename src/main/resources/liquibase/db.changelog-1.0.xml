@@ -117,4 +117,17 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="1.0.7" author="anatoliy.moiseev">
+        <createTable tableName="confirmation_token">
+            <column name="id" type="BIGINT">
+            </column>
+
+            <column name="token" type="VARCHAR(255)">
+            </column>
+
+
+
+        </createTable>
+    </changeSet>
+
 </databaseChangeLog>

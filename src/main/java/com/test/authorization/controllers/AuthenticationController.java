@@ -2,7 +2,9 @@ package com.test.authorization.controllers;
 
 import com.test.authorization.dto.SignInDto;
 import com.test.authorization.dto.SignUpDto;
+import com.test.authorization.exception.AppException;
 import com.test.authorization.exception.BadRequestException;
+import com.test.authorization.exception.ResourceNotFoundException;
 import com.test.authorization.model.User;
 import com.test.authorization.repository.UserRepository;
 import com.test.authorization.security.jwt.JwtTokenProvider;
@@ -83,23 +85,23 @@ public class AuthenticationController {
     public ResponseEntity refreshToken(@RequestParam String refreshToken) {
 
         String username = jwtTokenProvider.getUsername(refreshToken);
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("user", "username", username));
 
-        if (user.getRefreshToken().equals(refreshToken)) {
-            String newAccessToken = jwtTokenProvider.createAccessToken(username, user.getRoles());
-            String newRefreshToken = jwtTokenProvider.createRefreshToken(username);
-
-            Map<Object, Object> response = new HashMap<>();
-            response.put("newAccessToken", newAccessToken);
-            response.put("newRefreshToken", newRefreshToken);
-
-            user.setRefreshToken(refreshToken);
-            userRepository.save(user);
-
-            return ResponseEntity.ok(response);
+        if (!user.getRefreshToken().equals(refreshToken)) {
+            throw new AppException("Current refresh token not found");
         }
 
-        return ResponseEntity.ok("Dura");
+        String newAccessToken = jwtTokenProvider.createAccessToken(username, user.getRoles());
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(username);
+
+        Map<Object, Object> response = new HashMap<>();
+        response.put("newAccessToken", newAccessToken);
+        response.put("newRefreshToken", newRefreshToken);
+
+        user.setRefreshToken(refreshToken);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(response);
     }
 
 }

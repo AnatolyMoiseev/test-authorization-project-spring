@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.test.authorization.model.User;
 
 import lombok.Data;
-import lombok.Setter;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
